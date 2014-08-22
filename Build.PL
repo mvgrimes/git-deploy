@@ -4,7 +4,7 @@ my $build = Module::Build->new(
     module_name => 'App::GitDeploy',
     license     => 'perl',
     ## create_readme => 1,
-    ## script_files => [qw(script/git-deploy)],
+    script_files => [qw(script/git-deploy)],
 
     configure_requires => {
         'Module::Build' => '0.4004',
