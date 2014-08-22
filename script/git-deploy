@@ -1,5 +1,8 @@
 #!/usr/bin/env perl
 
+# PODNAME: git-deploy
+# ABSTRACT: deploy your app with git
+
 use strict;
 use warnings;
 use App::GitDeploy;

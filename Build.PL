@@ -1,8 +1,8 @@
 use Module::Build;
 
 my $build = Module::Build->new(
-    module_name   => 'App::GitDeploy',
-    license       => 'perl',
+    module_name => 'App::GitDeploy',
+    license     => 'perl',
     ## create_readme => 1,
     ## script_files => [qw(script/git-deploy)],
 
@@ -11,18 +11,19 @@ my $build = Module::Build->new(
     },
 
     requires => {
-        'perl'          => '5.012',
-        'App::Cmd'      => 0,
-        'IPC::Cmd'      => 0,
-        'Path::Class'   => 0,
-        'Git::Wrapper'  => 0,
-        'Data::Printer' => 0,
-        'autodie'       => 0,
-        'URI'           => 0,
-        'File::chdir'   => 0,
-        'Net::OpenSSH'  => 0,
-        'IO::Pty'       => 0,
-        'Moo'           => 0,
+        'perl'           => '5.012',
+        'App::Cmd'       => 0,
+        'IPC::Cmd'       => 0,
+        'Path::Class'    => 0,
+        'Git::Wrapper'   => 0,
+        'Data::Printer'  => 0,
+        'autodie'        => 0,
+        'URI'            => 0,
+        'File::chdir'    => 0,
+        'Net::OpenSSH'   => 0,
+        'IO::Pty'        => 0,
+        'Moo'            => 0,
+        'File::ShareDir' => 0,
     },
     build_requires =>
       {    # Should be test_requires, but MB still doesn't handle well
