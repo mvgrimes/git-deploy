@@ -1,0 +1,11 @@
+requires 'App::Cmd';
+requires 'IPC::Cmd';
+requires 'Path::Class';
+requires 'Git::Wrapper';
+requires 'Data::Printer';
+requires 'autodie';
+requires 'URI';
+requires 'File::chdir';
+requires 'Net::OpenSSH';
+requires 'IO::Pty';
+requires 'Moo';
