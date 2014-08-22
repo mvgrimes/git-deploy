@@ -4,6 +4,7 @@ use 5.012;
 use strict;
 use warnings;
 use Moo;
+use Net::OpenSSH;
 
 # use namespace::sweep;
 
@@ -21,10 +22,10 @@ sub _ssh_builder {
     );
     $ssh->error and die "Can't ssh to host: " . $ssh->error;
 
-    $ssh->test( 'cd', $self->uri->path )
-      or die "unable to cd into the remote dir: "
-      . $self->uri->path . "\n"
-      . $ssh->error;
+    # $ssh->test( 'cd', $self->uri->path )
+    #   or die "unable to cd into the remote dir: "
+    #   . $self->uri->path . "\n"
+    #   . $ssh->error;
 
     return $ssh;
 }
