@@ -17,7 +17,7 @@ __END__
 
 =head1 NAME
 
-App::EditorTools - Command line tool for Perl code refactoring
+App::GitDeploy - Command line tool to deploy any application using git
 
 =head1 VERSION
 
@@ -68,7 +68,6 @@ Which will perform the following:
      git checkout devel
      git push website master
      git tag master
-
 
 =head1 SEE ALSO
 

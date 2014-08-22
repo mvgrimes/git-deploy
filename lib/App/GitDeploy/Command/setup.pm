@@ -72,3 +72,27 @@ git checkout -f master
 
 1;
 
+__END__
+
+=pod
+
+=head1 NAME
+
+App::GitDeploy::Command::setup
+
+=head1 VERSION
+
+version 1.00
+
+=head1 AUTHOR
+
+Mark Grimes, E<lt>mgrimes@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Mark Grimes, E<lt>mgrimes@cpan.orgE<gt>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

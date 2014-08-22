@@ -33,7 +33,7 @@ __END__
 
 =head1 NAME
 
-App::EditorTools::Command::RenamePackageFromPath - Rename the package based on the file's path
+App::GitDeploy::Command::redeploy - ...
 
 =head1 VERSION
 
