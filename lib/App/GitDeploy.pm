@@ -7,7 +7,7 @@ use warnings;
 
 use App::Cmd::Setup -app;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 1;
 
@@ -21,7 +21,7 @@ App::GitDeploy - Command line tool to deploy any application using git
 
 =head1 VERSION
 
-version 1.00
+version 1.01
 
 =head1 DESCRIPTION
 

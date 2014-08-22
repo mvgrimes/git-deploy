@@ -9,7 +9,7 @@ use File::Path;
 
 use App::GitDeploy -command;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 our $config;
 
 sub opt_spec {
@@ -82,7 +82,7 @@ App::GitDeploy::Command::setup
 
 =head1 VERSION
 
-version 1.00
+version 1.01
 
 =head1 AUTHOR
 
