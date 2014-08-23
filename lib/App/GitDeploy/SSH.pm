@@ -14,6 +14,8 @@ has 'uri' => ( is => 'ro', required => 1, );
 sub _ssh_builder {
     my ($self) = @_;
 
+    # use Data::Printer;
+    # p $self->uri;
     my $ssh = Net::OpenSSH->new(
         $self->uri->host,
         user     => $self->uri->user,

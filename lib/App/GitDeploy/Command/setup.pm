@@ -23,16 +23,21 @@ sub opt_spec {
 sub validate_args {
     my ( $self, $opt, $args ) = @_;
 
+    # $self->app->validate_global_opts( $self->app->global_options );
+    # $config = $opt->{config};
+
     my $app    = $opt->{app};
     my $remote = $opt->{remote};
 
     $config = App::GitDeploy::Config->new( remote => $remote );
 
     $self->usage_error(
-        qq{Remote $remote must be configured. Try 'git remote add $remote "user\@example.com:/srv/repos/myapp.git"'}
+        qq{Remote $remote must be configured.\n} .
+        qq{Try 'git remote add $remote "ssh://user\@example.com/srv/repos/myapp.git"'}
     ) unless $config->remote_url;
     $self->usage_error(
-        qq{Remote $remote deploy dir must be configured. Try 'git --config --local remote.$remote.deploy "/srv/apps/myapp"'}
+        qq{Remote $remote deploy dir must be configured.\n} .
+       qq{Try 'git config --local remote.$remote.deploy "/srv/apps/myapp"'}
     ) unless $config->deploy_url;
 
     return 1;

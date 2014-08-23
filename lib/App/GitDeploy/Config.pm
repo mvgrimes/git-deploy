@@ -22,6 +22,7 @@ sub _build_deploy_dir {
 sub _build_deploy_url {
     my ($self) = @_;
 
+    return unless $self->deploy_dir;
     $self->_uri_replace_path( $self->remote_url, $self->deploy_dir->path );
 }
 
