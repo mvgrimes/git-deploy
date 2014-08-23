@@ -1,5 +1,6 @@
 package App::GitDeploy::Command::setup;
 
+use 5.012;
 use strict;
 use warnings;
 use Path::Class;
@@ -9,36 +10,21 @@ use File::Path;
 
 use App::GitDeploy -command;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 our $config;
 
 sub opt_spec {
     return (
-        [ "app|a=s",    "The app to deploy", { default => '.' } ],
-        [ "remote|r=s", "The remote repos",  { default => 'production' } ],
-        [ "work|w=s",   "The work " ],
+        # [ "app|a=s",    "The app to deploy", { default => '.' } ],
+        # [ "remote|r=s", "The remote repos",  { default => 'production' } ],
+        [ "work|w=s", "The work " ],
     );
 }
 
 sub validate_args {
     my ( $self, $opt, $args ) = @_;
 
-    # $self->app->validate_global_opts( $self->app->global_options );
-    # $config = $opt->{config};
-
-    my $app    = $opt->{app};
-    my $remote = $opt->{remote};
-
-    $config = App::GitDeploy::Config->new( remote => $remote );
-
-    $self->usage_error(
-        qq{Remote $remote must be configured.\n} .
-        qq{Try 'git remote add $remote "ssh://user\@example.com/srv/repos/myapp.git"'}
-    ) unless $config->remote_url;
-    $self->usage_error(
-        qq{Remote $remote deploy dir must be configured.\n} .
-       qq{Try 'git config --local remote.$remote.deploy "/srv/apps/myapp"'}
-    ) unless $config->deploy_url;
+    $config = $self->app->validate_global_opts();
 
     return 1;
 }
@@ -46,18 +32,22 @@ sub validate_args {
 sub execute {
     my ( $self, $opt, $arg ) = @_;
 
-    my $ssh = App::GitDeploy::SSH->new( uri => $config->remote_url );
+    my $ssh    = App::GitDeploy::SSH->new( uri => $config->remote_url );
+    my $app    = $self->app->global_options->{app};
+    my $remote = $self->app->global_options->{remote};
 
+    say "Creating the deployment repos: @{[ $config->remote_url ]}";
     $ssh->run( "git init --bare @{[ $config->remote_url->path ]}", );
+    say "Creating the deployment work dit: @{[ $config->deploy_dir ]}";
     $ssh->run( "mkdir @{[ $config->deploy_dir->path ]}", );
 
-    mkpath sprintf 'deploy/%s/%s', $opt->{app}, $opt->{remote};
-    mkpath sprintf 'deploy/%s/staging', $opt->{app};
+    mkpath sprintf( 'deploy/%s/%s', $app, $remote ), { verbose => 1 };
+    mkpath sprintf( 'deploy/%s/staging', $app ), { verbose => 1 };
 
-    my $pr_file =
-      file( sprintf 'deploy/%s/%s/post-receive', $opt->{app}, $opt->{remote} );
+    my $pr_file = file( sprintf 'deploy/%s/%s/post-receive', $app, $remote );
+    say "Creating [$pr_file]";
     $pr_file->spew(
-        qq{#!/bin/bash
+        q{#!/bin/bash
 
 function die { echo $@; exit 1; }
 
@@ -87,7 +77,7 @@ App::GitDeploy::Command::setup
 
 =head1 VERSION
 
-version 1.01
+version 1.02
 
 =head1 AUTHOR
 

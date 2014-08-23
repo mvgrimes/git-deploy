@@ -8,7 +8,7 @@ use Path::Class;
 
 use App::GitDeploy -command;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 sub opt_spec {
     # return ( [ "filename|f=s", "The filename and path of the package", ] );
@@ -37,7 +37,7 @@ App::GitDeploy::Command::redeploy - ...
 
 =head1 VERSION
 
-version 1.01
+version 1.02
 
 =head1 DESCRIPTION
 

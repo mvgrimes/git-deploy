@@ -13,26 +13,24 @@ use App::GitDeploy::Config;
 
 use App::GitDeploy -command;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 our $config;
 
 sub opt_spec {
     return (
-        [ "app|a=s",    "The app to deploy", { default => '.' } ],
-        [ "remote|r=s", "The remote repos",  { default => 'production' } ],
+        # [ "app|a=s",    "The app to deploy", { default => '.' } ],
+        # [ "remote|r=s", "The remote repos",  { default => 'production' } ],
     );
 }
 
 sub validate_args {
     my ( $self, $opt, $args ) = @_;
 
-    # $self->app->validate_global_opts( $self->app->global_options );
-    # $config = $opt->{config};
+    $config = $self->app->validate_global_opts();
 
-    my $app          = $opt->{app};
-    my $remote       = $opt->{remote};
+    my $app          = $self->app->global_options->{app};
+    my $remote       = $self->app->global_options->{remote};
     my $post_receive = "deploy/$app/$remote/post-receive";
-    $config = App::GitDeploy::Config->new( remote => $remote );
 
     $self->usage_error("A valid app must be specificed")
       unless -d "deploy/$app/";
@@ -41,22 +39,13 @@ sub validate_args {
     $self->usage_error("$post_receive must be executable")
       unless -x $post_receive;
 
-    $self->usage_error(
-        qq{Remote $remote must be configured.\n} .
-        qq{Try 'git remote add $remote "ssh://user\@example.com/srv/repos/myapp.git"'}
-    ) unless $config->remote_url;
-    $self->usage_error(
-        qq{Remote $remote deploy dir must be configured.\n} .
-       qq{Try 'git config --local remote.$remote.deploy "/srv/apps/myapp"'}
-    ) unless $config->deploy_url;
-
     return 1;
 }
 
 sub execute {
     my ( $self, $opt, $arg ) = @_;
-    my $app = $opt->{app};
-    my $remote = $opt->{remote};
+    my $app    = $self->app->global_options->{app};
+    my $remote = $self->app->global_options->{remote};
 
     run( { cmd => "deploy/$app/staging/before-deploy", if_exists => 1 } );
     run( { cmd => "git push $remote master" } );
@@ -64,6 +53,7 @@ sub execute {
 
     my $post_receive =
       file("deploy/$app/$remote/post-receive")->cleanup->stringify;
+
     run( {
         cmd  => qq{eval "\$( git show master:$post_receive )"},
         host => $config->remote_url,
@@ -155,7 +145,7 @@ App::GitDeploy::Command::go
 
 =head1 VERSION
 
-version 1.01
+version 1.02
 
 =head1 AUTHOR
 

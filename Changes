@@ -1,5 +1,10 @@
 App::GitDeploy
 
+1.02 - Sat Aug 23 11:59:34 EDT 2014
+    Move some options to be global options.
+    Deal with missing config options better, cleanup error messages.
+    Bug fixes.
+
 1.01 - Fri Aug 22 18:19:43 EDT 2014
     Explicitly add git-deploy to script_files
 

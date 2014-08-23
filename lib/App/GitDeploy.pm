@@ -5,47 +5,34 @@ package App::GitDeploy;
 use 5.012;
 use strict;
 use warnings;
-## use App::GitDeploy::Config;
+use App::GitDeploy::Config;
 
 use App::Cmd::Setup -app;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
-# sub global_opt_spec {
-#     return (
-#         [ "app|a=s",    "The app to deploy", { default => '.' } ],
-#         [ "remote|r=s", "The remote repos",  { default => 'production' } ],
-#     );
-# }
+sub global_opt_spec {
+    return (
+        [ "app|a=s",    "The app to deploy", { default => '.' } ],
+        [ "remote|r=s", "The remote repos",  { default => 'production' } ],
+    );
+}
 
-# sub validate_global_opts {
-#     my ( $self, $opt, $args ) = @_;
-#
-#     my $app          = $opt->{app};
-#     my $remote       = $opt->{remote};
-#     my $post_receive = "deploy/$app/$remote/post-receive";
-#     my $config = App::GitDeploy::Config->new( remote => $remote );
-#     $opt->{config} = $config;
-#
-#     $self->usage_error("A valid app must be specificed")
-#       unless -d "deploy/$app/";
-#     $self->usage_error("$post_receive must be created")
-#       unless -e $post_receive;
-#     $self->usage_error("$post_receive must be executable")
-#       unless -x $post_receive;
-#
-#     $self->usage_error(
-#         qq{Remote $remote must be configured.\n} .
-#         qq{Try 'git remote add $remote "ssh://user\@example.com/srv/repos/myapp.git"'}
-#     ) unless $config->remote_url;
-#     $self->usage_error(
-#         qq{Remote $remote deploy dir must be configured.\n} .
-#        qq{Try 'git config --local remote.$remote.deploy "/srv/apps/myapp"'}
-#     ) unless $config->deploy_url;
-#
-#     return 1;
-# }
+sub validate_global_opts {
+    my ($self) = @_;
 
+    my $remote = $self->global_options->{remote};
+    my $config = App::GitDeploy::Config->new( remote => $remote );
+
+    $self->usage_error( qq{Remote $remote must be configured.\n}
+          . qq{Try 'git remote add $remote "ssh://user\@example.com/srv/repos/myapp.git"'}
+    ) unless $config->remote_url;
+    $self->usage_error( qq{Remote $remote deploy dir must be configured.\n}
+          . qq{Try 'git config --local remote.$remote.deploy "/srv/apps/myapp"'}
+    ) unless $config->deploy_url;
+
+    return $config;
+}
 
 1;
 
@@ -59,7 +46,7 @@ App::GitDeploy - Command line tool to deploy any application using git
 
 =head1 VERSION
 
-version 1.01
+version 1.02
 
 =head1 DESCRIPTION
 
