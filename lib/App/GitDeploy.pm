@@ -21,6 +21,7 @@ sub global_opt_spec {
 sub validate_global_opts {
     my ($self) = @_;
 
+    # TODO: make sure git repos exists
     my $remote = $self->global_options->{remote};
     my $config = App::GitDeploy::Config->new( remote => $remote );
 
