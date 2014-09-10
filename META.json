@@ -29,14 +29,17 @@
          "requires" : {
             "App::Cmd" : "0",
             "Data::Printer" : "0",
+            "Expect" : "0",
             "File::ShareDir" : "1.00",
             "File::chdir" : "0",
             "Git::Wrapper" : "0",
             "IO::Pty" : "0",
+            "IO::Stty" : "0",
             "IPC::Cmd" : "0",
             "Moo" : "0",
             "Net::OpenSSH" : "0",
             "Path::Class" : "0",
+            "Term::ReadKey" : "0",
             "URI" : "0",
             "autodie" : "0",
             "perl" : "5.012"
@@ -46,19 +49,19 @@
    "provides" : {
       "App::GitDeploy" : {
          "file" : "lib/App/GitDeploy.pm",
-         "version" : "1.02"
+         "version" : "1.03"
       },
       "App::GitDeploy::Command::go" : {
          "file" : "lib/App/GitDeploy/Command/go.pm",
-         "version" : "1.02"
+         "version" : "1.03"
       },
       "App::GitDeploy::Command::redeploy" : {
          "file" : "lib/App/GitDeploy/Command/redeploy.pm",
-         "version" : "1.02"
+         "version" : "1.03"
       },
       "App::GitDeploy::Command::setup" : {
          "file" : "lib/App/GitDeploy/Command/setup.pm",
-         "version" : "1.02"
+         "version" : "1.03"
       },
       "App::GitDeploy::Config" : {
          "file" : "lib/App/GitDeploy/Config.pm"
@@ -79,5 +82,5 @@
          "url" : "http://github.com/mvgrimes/app-gitdeploy"
       }
    },
-   "version" : "1.02"
+   "version" : "1.03"
 }

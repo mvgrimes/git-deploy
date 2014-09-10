@@ -4,7 +4,7 @@ App::GitDeploy - Command line tool to deploy any application using git
 
 # VERSION
 
-version 1.02
+version 1.03
 
 # DESCRIPTION
 
@@ -27,7 +27,7 @@ Deploy with:
 
 Which will perform the following:
 
-    * Locally run deploy/staging/before-deploy
+    * Locally run deploy/production/before-deploy
     * git push production master
     * Remotely run deploy/production/post-receive from the /srv/repos/myapp.git
       dir

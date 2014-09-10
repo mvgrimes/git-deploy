@@ -9,7 +9,7 @@ use App::GitDeploy::Config;
 
 use App::Cmd::Setup -app;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 sub global_opt_spec {
     return (
@@ -47,7 +47,7 @@ App::GitDeploy - Command line tool to deploy any application using git
 
 =head1 VERSION
 
-version 1.02
+version 1.03
 
 =head1 DESCRIPTION
 
