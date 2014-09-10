@@ -47,9 +47,12 @@ sub execute {
     my $app    = $self->app->global_options->{app};
     my $remote = $self->app->global_options->{remote};
 
-    run( { cmd => "deploy/$app/staging/before-deploy", if_exists => 1 } );
-    run( { cmd => "git push $remote master" } );
-    run( { cmd => "deploy/$app/staging/after-deploy",  if_exists => 1 } );
+    my $prior = ( split /\s+/, `git show-ref refs/remotes/$remote/master` )[0];
+    my $current = ( split /\s+/, `git show-ref refs/heads/master` )[0];
+
+    run( { cmd => "deploy/$app/$remote/before-deploy", if_exists => 1 } );
+    run( { cmd => "git push --tags $remote master" } );
+    run( { cmd => "deploy/$app/$remote/after-deploy",  if_exists => 1 } );
 
     my $post_receive =
       file("deploy/$app/$remote/post-receive")->cleanup->stringify;
@@ -60,17 +63,17 @@ sub execute {
     } );
 
     run( {
-        cmd       => "deploy/$app/$remote/before-restart",
+        cmd       => "deploy/$app/$remote/before-restart $prior $current",
         host      => $config->deploy_url,
         if_exists => 1
     } );
     run( {
-        cmd       => "deploy/$app/$remote/restart",
+        cmd       => "deploy/$app/$remote/restart $prior $current",
         host      => $config->deploy_url,
         if_exists => 1
     } );
     run( {
-        cmd       => "deploy/$app/$remote/after-restart",
+        cmd       => "deploy/$app/$remote/after-restart $prior $current",
         host      => $config->deploy_url,
         if_exists => 1
     } );
@@ -131,6 +134,8 @@ sub local_run {
         verbose => 1,
         buffer  => \$buffer,
     ) or die "Error running '$opts->{cmd}'\n";
+
+    return $buffer;
 }
 
 1;

@@ -5,6 +5,8 @@ use strict;
 use warnings;
 use Moo;
 use Net::OpenSSH;
+use Expect;
+use Term::ReadKey;
 
 # use namespace::sweep;
 
@@ -36,8 +38,50 @@ sub run {
     my ( $self, $cmd ) = @_;
 
     say "SSH running [$cmd]";
-    $self->ssh->system($cmd)
-      or die "Error executing on remote: " . $self->ssh->error;
+    my $ssh = $self->ssh;
+    my ( $pty, $pid ) =
+      $ssh->open2pty( { stderr_to_stdout => 1, tty => 1 }, $cmd )
+      or die "Error executing on remote: " . $ssh->error;
+
+    my $expect = Expect->init($pty);
+    $expect->log_stdout(1);
+    $expect->expect(
+        240,
+        [
+            qr/\[sudo\] password for (.*): / => sub {
+                my $exp      = shift;
+                my $password = get_pw();
+                $exp->send("$password\n");
+                print "sent\n";
+                exp_continue;
+              }
+        ],
+    );
+}
+
+sub get_pw {
+    my $prompt = shift;
+
+    $|++;
+    print $prompt if defined $prompt;
+
+    ReadMode('noecho');
+    ReadMode('raw');
+
+    my $pass = '';
+    while (1) {
+        my $c;
+        1 until defined( $c = ReadKey(-1) );
+        exit if ord($c) == 3;    # ctrl-c
+        last if $c eq "\n";
+        print "*";
+        $pass .= $c;
+    }
+    print "\n";
+
+    END { ReadMode('restore'); }
+
+    return $pass;
 }
 
 sub test {

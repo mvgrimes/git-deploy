@@ -70,7 +70,7 @@ Deploy with:
 
 Which will perform the following:
 
-  * Locally run deploy/staging/before-deploy
+  * Locally run deploy/production/before-deploy
   * git push production master
   * Remotely run deploy/production/post-receive from the /srv/repos/myapp.git
     dir

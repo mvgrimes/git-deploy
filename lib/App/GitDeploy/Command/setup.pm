@@ -39,10 +39,9 @@ sub execute {
     say "Creating the deployment repos: @{[ $config->remote_url ]}";
     $ssh->run( "git init --bare @{[ $config->remote_url->path ]}", );
     say "Creating the deployment work dit: @{[ $config->deploy_dir ]}";
-    $ssh->run( "mkdir @{[ $config->deploy_dir->path ]}", );
+    $ssh->run( "test -d @{[ $config->deploy_dir->path ]} || mkdir @{[ $config->deploy_dir->path ]}", );
 
     mkpath sprintf( 'deploy/%s/%s', $app, $remote ), { verbose => 1 };
-    mkpath sprintf( 'deploy/%s/staging', $app ), { verbose => 1 };
 
     my $pr_file = file( sprintf 'deploy/%s/%s/post-receive', $app, $remote );
     say "Creating [$pr_file]";

@@ -22,8 +22,11 @@ my $build = Module::Build->new(
         'File::chdir'    => 0,
         'Net::OpenSSH'   => 0,
         'IO::Pty'        => 0,
+        'IO::Stty'        => 0,
+        'Expect'         => 0,
         'Moo'            => 0,
         'File::ShareDir' => 0,
+        'Term::ReadKey' => 0,
     },
     build_requires =>
       {    # Should be test_requires, but MB still doesn't handle well
