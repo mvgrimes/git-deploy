@@ -7,25 +7,28 @@ use Moo;
 use Net::OpenSSH;
 use Expect;
 use Term::ReadKey;
+use Term::ANSIColor;
 
 # use namespace::sweep;
 
 has 'ssh' => ( is => 'ro', builder => '_ssh_builder', lazy => 1, );
-has 'uri' => ( is => 'ro', required => 1, );
-has 'failure_msg' => ( is=>'ro', default => 'SSH_CMD_FAILED' );
+has 'uri'         => ( is => 'ro', required => 1, );
+has 'failure_msg' => ( is => 'ro', default  => 'SSH_CMD_FAILED' );
 
 sub _ssh_builder {
     my ($self) = @_;
 
-    # use Data::Printer;
-    # p $self->uri;
     my $ssh = Net::OpenSSH->new(
         $self->uri->host,
         user     => $self->uri->user,
         port     => $self->uri->port,
         password => $self->uri->password,
     );
-    $ssh->error and die "Can't ssh to host: " . $ssh->error;
+    $ssh->error
+      and die color('red')
+      . "Can't ssh to host: "
+      . $ssh->error
+      . color('reset');
 
     # $ssh->test( 'cd', $self->uri->path )
     #   or die "unable to cd into the remote dir: "
@@ -39,11 +42,14 @@ sub run {
     my ( $self, $cmd ) = @_;
 
     $cmd .= sprintf q{ || echo "%s" }, $self->failure_msg;
-    say "SSH running [$cmd]";
+    say color('grey12') . "SSH running [$cmd]" . color('reset');
     my $ssh = $self->ssh;
     my ( $pty, $pid ) =
       $ssh->open2pty( { stderr_to_stdout => 1, tty => 1 }, $cmd )
-      or die "Error executing on remote: " . $ssh->error;
+      or die color('red')
+      . "Error executing on remote: "
+      . $ssh->error
+      . color('reset');
 
     my $expect = Expect->init($pty);
     my $failed = 0;
@@ -98,7 +104,7 @@ sub get_pw {
 sub test {
     my ( $self, $cmd ) = @_;
 
-    say "SSH testing [$cmd]";
+    say color('grey8') . "SSH testing [$cmd]" . color('reset');
     return $self->ssh->test($cmd);
 }
 
