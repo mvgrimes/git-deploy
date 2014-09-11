@@ -1,5 +1,9 @@
 App::GitDeploy
 
+1.04 - Wed Sep 10 22:17:15 EDT 2014
+    Adds a bit more color to error message and run notices
+    Watches for SSH failures, adds some color, eliminates need to eval
+
 1.03 - Tue Sep  9 21:41:50 EDT 2014
     Adds ability to deal with sudo password requests
     Adds a TODO message to remind to check that we are in a repo

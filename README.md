@@ -4,7 +4,7 @@ App::GitDeploy - Command line tool to deploy any application using git
 
 # VERSION
 
-version 1.03
+version 1.04
 
 # DESCRIPTION
 
