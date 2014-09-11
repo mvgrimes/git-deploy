@@ -10,10 +10,11 @@ use Path::Class qw(dir file);
 use File::chdir;
 use App::GitDeploy::SSH;
 use App::GitDeploy::Config;
+use Term::ANSIColor;
 
 use App::GitDeploy -command;
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 our $config;
 
 sub opt_spec {
@@ -58,7 +59,8 @@ sub execute {
       file("deploy/$app/$remote/post-receive")->cleanup->stringify;
 
     run( {
-        cmd  => qq{eval "\$( git show master:$post_receive )"},
+        cmd  => qq{pr=\$( mktemp ) && git show master:$post_receive > \$pr \\
+                   && bash \$pr },
         host => $config->remote_url,
     } );
 
@@ -102,13 +104,18 @@ sub remote_run {
         my $ssh = App::GitDeploy::SSH->new( uri => $opts->{host} );
 
         if ( $opts->{if_exists} ) {
+            my $cmd = ( split /\s+/, $opts->{cmd} )[0];
             my $test_cmd = qq{
                 cd @{[ $opts->{host}->path ]};
-                test -x $opts->{cmd} };
+                test -x $cmd };
             return unless $ssh->test($test_cmd);
         }
 
-        $ssh->run($cmd);
+        $ssh->run($cmd)
+          or die color('red')
+          . "Error running '$cmd on remote'\n"
+          . color('reset') . "\n";
+
     } else {
         local $CWD = $opts->{host}->path;
 
@@ -133,7 +140,10 @@ sub local_run {
         command => $opts->{cmd},
         verbose => 1,
         buffer  => \$buffer,
-    ) or die "Error running '$opts->{cmd}'\n";
+      )
+      or die color('red')
+      . "Error running '$opts->{cmd}'\n"
+      . color('reset') . "\n";
 
     return $buffer;
 }
@@ -150,7 +160,7 @@ App::GitDeploy::Command::go
 
 =head1 VERSION
 
-version 1.03
+version 1.04
 
 =head1 AUTHOR
 

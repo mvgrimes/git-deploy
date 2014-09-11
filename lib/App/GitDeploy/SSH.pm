@@ -12,6 +12,7 @@ use Term::ReadKey;
 
 has 'ssh' => ( is => 'ro', builder => '_ssh_builder', lazy => 1, );
 has 'uri' => ( is => 'ro', required => 1, );
+has 'failure_msg' => ( is=>'ro', default => 'SSH_CMD_FAILED' );
 
 sub _ssh_builder {
     my ($self) = @_;
@@ -37,6 +38,7 @@ sub _ssh_builder {
 sub run {
     my ( $self, $cmd ) = @_;
 
+    $cmd .= sprintf q{ || echo "%s" }, $self->failure_msg;
     say "SSH running [$cmd]";
     my $ssh = $self->ssh;
     my ( $pty, $pid ) =
@@ -44,6 +46,7 @@ sub run {
       or die "Error executing on remote: " . $ssh->error;
 
     my $expect = Expect->init($pty);
+    my $failed = 0;
     $expect->log_stdout(1);
     $expect->expect(
         240,
@@ -52,11 +55,19 @@ sub run {
                 my $exp      = shift;
                 my $password = get_pw();
                 $exp->send("$password\n");
-                print "sent\n";
+                exp_continue;
+              }
+        ],
+        [
+            qr/@{[ $self->failure_msg ]}/ => sub {
+                my $exp = shift;
+                $failed++;
                 exp_continue;
               }
         ],
     );
+
+    return !$failed;
 }
 
 sub get_pw {
@@ -103,7 +114,7 @@ App::GitDeploy::SSH
 
 =head1 VERSION
 
-version 1.03
+version 1.04
 
 =head1 AUTHOR
 
