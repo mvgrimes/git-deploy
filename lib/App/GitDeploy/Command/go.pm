@@ -59,7 +59,8 @@ sub execute {
       file("deploy/$app/$remote/post-receive")->cleanup->stringify;
 
     run( {
-        cmd  => qq{pr=\$( mktemp ) && git show master:$post_receive > \$pr \\
+        cmd  => qq{pr=\$( mktemp -t git-deploy.XXXXXXX ) \\
+                   && git show master:$post_receive > \$pr \\
                    && bash \$pr },
         host => $config->remote_url,
     } );
