@@ -39,14 +39,17 @@ sub execute {
     say "Creating the deployment repos: @{[ $config->remote_url ]}";
     $ssh->run( "git init --bare @{[ $config->remote_url->path ]}", );
     say "Creating the deployment work dit: @{[ $config->deploy_dir ]}";
-    $ssh->run( "test -d @{[ $config->deploy_dir->path ]} || mkdir @{[ $config->deploy_dir->path ]}", );
+    $ssh->run(
+        "test -d @{[ $config->deploy_dir->path ]} || mkdir @{[ $config->deploy_dir->path ]}",
+    );
 
     mkpath sprintf( 'deploy/%s/%s', $app, $remote ), { verbose => 1 };
 
     my $pr_file = file( sprintf 'deploy/%s/%s/post-receive', $app, $remote );
-    say "Creating [$pr_file]";
-    $pr_file->spew(
-        q{#!/bin/bash
+    if ( !-e $pr_file ) {
+        say "Creating [$pr_file]";
+        $pr_file->spew(
+            q{#!/bin/bash
 
 function die { echo $@; exit 1; }
 
@@ -58,7 +61,8 @@ git diff --quiet || die "Changes to production files found. Aborting."
 git ls-files -o  | grep . >/dev/null && die "Untracked files. Aborting."
 git checkout -f master
         }
-    );
+        );
+    }
     chmod 0755, $pr_file;
 
     return;
