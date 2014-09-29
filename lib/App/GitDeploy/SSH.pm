@@ -55,7 +55,7 @@ sub run {
     my $failed = 0;
     $expect->log_stdout(1);
     $expect->expect(
-        240,
+        undef,
         [
             qr/\[sudo\] password for (.*): / => sub {
                 my $exp      = shift;
