@@ -4,7 +4,7 @@
       "Mark Grimes, E<lt>mgrimes@cpan.orgE<gt>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4005, CPAN::Meta::Converter version 2.133380",
+   "generated_by" : "Module::Build version 0.4208",
    "license" : [
       "perl_5"
    ],
@@ -50,19 +50,19 @@
    "provides" : {
       "App::GitDeploy" : {
          "file" : "lib/App/GitDeploy.pm",
-         "version" : "1.04"
+         "version" : "1.07"
       },
       "App::GitDeploy::Command::go" : {
          "file" : "lib/App/GitDeploy/Command/go.pm",
-         "version" : "1.04"
+         "version" : "1.07"
       },
       "App::GitDeploy::Command::redeploy" : {
          "file" : "lib/App/GitDeploy/Command/redeploy.pm",
-         "version" : "1.04"
+         "version" : "1.07"
       },
       "App::GitDeploy::Command::setup" : {
          "file" : "lib/App/GitDeploy/Command/setup.pm",
-         "version" : "1.04"
+         "version" : "1.07"
       },
       "App::GitDeploy::Config" : {
          "file" : "lib/App/GitDeploy/Config.pm"
@@ -83,5 +83,5 @@
          "url" : "http://github.com/mvgrimes/app-gitdeploy"
       }
    },
-   "version" : "1.04"
+   "version" : "1.07"
 }

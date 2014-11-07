@@ -73,6 +73,8 @@ sub run {
         ],
     );
 
+    warn "Exit status is: " . ($expect->exitstatus // 'undef' ). "\n";
+
     return !$failed;
 }
 
@@ -120,7 +122,7 @@ App::GitDeploy::SSH
 
 =head1 VERSION
 
-version 1.04
+version 1.07
 
 =head1 AUTHOR
 

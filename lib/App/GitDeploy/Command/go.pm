@@ -14,7 +14,7 @@ use Term::ANSIColor;
 
 use App::GitDeploy -command;
 
-our $VERSION = '1.04';
+our $VERSION = '1.07';
 our $config;
 
 sub opt_spec {
@@ -43,6 +43,12 @@ sub validate_args {
     return 1;
 }
 
+sub announce {
+    my ($self, $msg, $color) = @_;
+    $color //= 'blue';
+    say color($color) . $msg . color('reset');
+}
+
 sub execute {
     my ( $self, $opt, $arg ) = @_;
     my $app    = $self->app->global_options->{app};
@@ -51,13 +57,18 @@ sub execute {
     my $prior = ( split /\s+/, `git show-ref refs/remotes/$remote/master` )[0];
     my $current = ( split /\s+/, `git show-ref refs/heads/master` )[0];
 
+
+    $self->announce( 'before-deploy' );
     run( { cmd => "deploy/$app/$remote/before-deploy", if_exists => 1 } );
+    $self->announce( 'pushing' );
     run( { cmd => "git push --tags $remote master" } );
+    $self->announce( 'after-deploy' );
     run( { cmd => "deploy/$app/$remote/after-deploy",  if_exists => 1 } );
 
     my $post_receive =
       file("deploy/$app/$remote/post-receive")->cleanup->stringify;
 
+    $self->announce( 'post-received' );
     run( {
         cmd  => qq{pr=\$( mktemp -t git-deploy.XXXXXXX ) \\
                    && git show master:$post_receive > \$pr \\
@@ -65,16 +76,19 @@ sub execute {
         host => $config->remote_url,
     } );
 
+    $self->announce( 'before-restart' );
     run( {
         cmd       => "deploy/$app/$remote/before-restart $prior $current",
         host      => $config->deploy_url,
         if_exists => 1
     } );
+    $self->announce( 'restart' );
     run( {
         cmd       => "deploy/$app/$remote/restart $prior $current",
         host      => $config->deploy_url,
         if_exists => 1
     } );
+    $self->announce( 'after-restart' );
     run( {
         cmd       => "deploy/$app/$remote/after-restart $prior $current",
         host      => $config->deploy_url,
@@ -161,7 +175,7 @@ App::GitDeploy::Command::go
 
 =head1 VERSION
 
-version 1.04
+version 1.07
 
 =head1 AUTHOR
 

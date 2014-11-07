@@ -62,7 +62,7 @@ App::GitDeploy::Config
 
 =head1 VERSION
 
-version 1.04
+version 1.07
 
 =head1 AUTHOR
 

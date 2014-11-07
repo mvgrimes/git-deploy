@@ -1,5 +1,14 @@
 App::GitDeploy
 
+1.07 - Fri Nov  7 08:58:49 EST 2014
+    Improves error handling of remote calls
+    Removes expect's timout (carton installs can take a while)
+    Skips creation of post-receive file if exists
+    Fix mktemp call to be more portable
+    Preps for release
+    Adds a bit more color to error message and run notices
+    Watches for SSH failures, adds some color, eliminates need to eval
+
 1.04 - Wed Sep 10 22:17:15 EDT 2014
     Adds a bit more color to error message and run notices
     Watches for SSH failures, adds some color, eliminates need to eval

@@ -15,7 +15,7 @@ use App::GitDeploy::Config;
 
 use App::GitDeploy -command;
 
-our $VERSION = '1.04';
+our $VERSION = '1.07';
 our $config;
 
 sub opt_spec {
@@ -148,7 +148,7 @@ App::GitDeploy::Command::redeploy - ...
 
 =head1 VERSION
 
-version 1.04
+version 1.07
 
 =head1 DESCRIPTION
 
