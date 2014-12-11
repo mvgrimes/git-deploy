@@ -8,7 +8,7 @@ use warnings;
 use App::GitDeploy::Config;
 use File::chdir;
 use IPC::Cmd ();
-use IPC::System::Simple qw(run runx capture capturex);
+use IPC::System::Simple qw(system systemx capture capturex);
 
 use App::Cmd::Setup -app;
 
