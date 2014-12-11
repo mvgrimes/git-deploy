@@ -11,11 +11,12 @@ use Path::Class qw(dir file);
 use File::chdir;
 use App::GitDeploy::SSH;
 use App::GitDeploy::Config;
+use Role::Tiny::With;
 
 use App::GitDeploy -command;
+with 'App::GitDeploy::Role::Run';
 
-our $VERSION = '1.08';
-our $config;
+our $VERSION = '1.09';
 
 sub opt_spec {
     return (
@@ -27,8 +28,7 @@ sub opt_spec {
 sub validate_args {
     my ( $self, $opt, $args ) = @_;
 
-    $config = $self->app->validate_global_opts();
-
+    my $config       = $self->app->validate_global_opts();
     my $app          = $self->app->global_options->{app};
     my $remote       = $self->app->global_options->{remote};
     my $post_receive = "deploy/$app/$remote/post-receive";
@@ -55,24 +55,24 @@ sub execute {
     my $post_receive =
       file("deploy/$app/$remote/post-receive")->cleanup->stringify;
 
-    $self->_run( {
+    $self->run( {
         cmd  => qq{eval "\$( git show master:$post_receive )"},
-        host => $config->remote_url,
+        host => $self->app->config->remote_url,
     } );
 
-    $self->_run( {
+    $self->run( {
         cmd       => "deploy/$app/$remote/before-restart",
-        host      => $config->deploy_url,
+        host      => $self->app->config->deploy_url,
         if_exists => 1
     } );
-    $self->_run( {
+    $self->run( {
         cmd       => "deploy/$app/$remote/restart",
-        host      => $config->deploy_url,
+        host      => $self->app->config->deploy_url,
         if_exists => 1
     } );
-    $self->_run( {
+    $self->run( {
         cmd       => "deploy/$app/$remote/after-restart",
-        host      => $config->deploy_url,
+        host      => $self->app->config->deploy_url,
         if_exists => 1
     } );
 }
@@ -89,7 +89,7 @@ App::GitDeploy::Command::redeploy - ...
 
 =head1 VERSION
 
-version 1.08
+version 1.09
 
 =head1 DESCRIPTION
 

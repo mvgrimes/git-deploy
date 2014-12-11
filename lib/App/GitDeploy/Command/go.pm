@@ -6,14 +6,13 @@ use warnings;
 use Path::Class;
 use Data::Printer;
 use Path::Class qw(dir file);
-use App::GitDeploy::SSH;
-use App::GitDeploy::Config;
+use Role::Tiny::With;
 use Term::ANSIColor;
 
 use App::GitDeploy -command;
+with 'App::GitDeploy::Role::Run';
 
-our $VERSION = '1.08';
-our $config;
+our $VERSION = '1.09';
 
 sub opt_spec {
     return (
@@ -25,8 +24,7 @@ sub opt_spec {
 sub validate_args {
     my ( $self, $opt, $args ) = @_;
 
-    $config = $self->app->validate_global_opts();
-
+    my $config       = $self->app->validate_global_opts();
     my $app          = $self->app->global_options->{app};
     my $remote       = $self->app->global_options->{remote};
     my $post_receive = "deploy/$app/$remote/post-receive";
@@ -56,39 +54,40 @@ sub execute {
     my $current = ( split /\s+/, `git show-ref refs/heads/master` )[0];
 
     $self->announce('before-deploy');
-    $self->_run( { cmd => "deploy/$app/$remote/before-deploy", if_exists => 1 } );
+    $self->run(
+        { cmd => "deploy/$app/$remote/before-deploy", if_exists => 1 } );
     $self->announce('pushing');
-    $self->_run( { cmd => "git push --tags $remote master" } );
+    $self->run( { cmd => "git push --tags $remote master" } );
     $self->announce('after-deploy');
-    $self->_run( { cmd => "deploy/$app/$remote/after-deploy", if_exists => 1 } );
+    $self->run( { cmd => "deploy/$app/$remote/after-deploy", if_exists => 1 } );
 
     my $post_receive =
       file("deploy/$app/$remote/post-receive")->cleanup->stringify;
 
     $self->announce('post-received');
-    $self->_run( {
+    $self->run( {
             cmd => qq{pr=\$( mktemp -t git-deploy.XXXXXXX ) \\
                    && git show master:$post_receive > \$pr \\
                    && bash \$pr },
-            host => $config->remote_url,
+            host => $self->app->config->remote_url,
     } );
 
     $self->announce('before-restart');
-    $self->_run( {
+    $self->run( {
         cmd       => "deploy/$app/$remote/before-restart $prior $current",
-        host      => $config->deploy_url,
+        host      => $self->app->config->deploy_url,
         if_exists => 1
     } );
     $self->announce('restart');
-    $self->_run( {
+    $self->run( {
         cmd       => "deploy/$app/$remote/restart $prior $current",
-        host      => $config->deploy_url,
+        host      => $self->app->config->deploy_url,
         if_exists => 1
     } );
     $self->announce('after-restart');
-    $self->_run( {
+    $self->run( {
         cmd       => "deploy/$app/$remote/after-restart $prior $current",
-        host      => $config->deploy_url,
+        host      => $self->app->config->deploy_url,
         if_exists => 1
     } );
 }
@@ -105,7 +104,7 @@ App::GitDeploy::Command::go
 
 =head1 VERSION
 
-version 1.08
+version 1.09
 
 =head1 AUTHOR
 

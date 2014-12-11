@@ -6,14 +6,10 @@ use 5.012;
 use strict;
 use warnings;
 use App::GitDeploy::Config;
-use File::chdir;
-use IPC::Cmd ();
-use IPC::System::Simple qw(system systemx capture capturex);
 
 use App::Cmd::Setup -app;
 
-our $VERSION = '1.08';
-our $config;
+our $VERSION = '1.09';
 
 sub global_opt_spec {
     return (
@@ -25,87 +21,32 @@ sub global_opt_spec {
 sub validate_global_opts {
     my ($self) = @_;
 
-    $self->usage_error( "Must be run at the root of your git repo." )
+    $self->usage_error("Must be run at the root of your git repo.")
       unless -e '.git';
 
     my $remote = $self->global_options->{remote};
-    $config = App::GitDeploy::Config->new( remote => $remote );
 
     $self->usage_error( qq{Remote $remote must be configured.\n}
           . qq{Try 'git remote add $remote "ssh://user\@example.com/srv/repos/myapp.git"'}
-    ) unless $config->remote_url;
+    ) unless $self->config->remote_url;
+
     $self->usage_error( qq{Remote $remote deploy dir must be configured.\n}
           . qq{Try 'git config --local remote.$remote.deploy "/srv/apps/myapp"'}
-    ) unless $config->deploy_url;
+    ) unless $self->config->deploy_url;
+
+    return $self->config;
+}
+
+sub config {
+    my ($self) = @_;
+    state $config;
+
+    do {
+        my $remote = $self->global_options->{remote};
+        $config = App::GitDeploy::Config->new( remote => $remote );
+    } unless $config;
 
     return $config;
-}
-
-sub _run {
-    my ($opts) = @_;
-
-    if ( exists $opts->{host} ) {
-        remote_run($opts);
-    } else {
-        local_run($opts);
-    }
-}
-
-sub _remote_run {
-    my ($opts) = @_;
-
-    my $cmd = qq{
-        export GIT_DIR="@{[ $config->remote_url->path ]}";
-        export GIT_WORK_TREE="@{[ $config->deploy_dir->path ]}";
-        cd @{[ $opts->{host}->path ]};
-        $opts->{cmd} };
-
-    if ( $opts->{host}->scheme eq 'ssh' ) {
-        my $ssh = App::GitDeploy::SSH->new( uri => $opts->{host} );
-
-        if ( $opts->{if_exists} ) {
-            my $cmd = ( split /\s+/, $opts->{cmd} )[0];
-            my $test_cmd = qq{
-                cd @{[ $opts->{host}->path ]};
-                test -x $cmd };
-            return unless $ssh->test($test_cmd);
-        }
-
-        $ssh->run($cmd)
-          or die color('red')
-          . "Error running '$cmd on remote'\n"
-          . color('reset') . "\n";
-
-    } else {
-        local $CWD = $opts->{host}->path;
-
-        die "Remote path doesn't appear to exist"
-          unless -d $opts->{host}->path;
-
-        local_run( { $opts, cmd => $cmd } );
-    }
-
-}
-
-sub _local_run {
-    my ($opts) = @_;
-    my $buffer;
-
-    if ( $opts->{if_exists} ) {
-        my ( $cmd, undef ) = split / /, $opts->{cmd}, 2;
-        return unless IPC::Cmd::can_run($cmd);
-    }
-
-    say color('grey12') . "running [$opts->{cmd}]" . color('reset');
-    try {
-        system( $opts->{cmd} );
-    }
-    catch {
-        die color('red')
-          . "Error running '$opts->{cmd}'\n"
-          . $_ . "\n"
-          . color('reset') . "\n";
-    };
 }
 
 1;
@@ -120,7 +61,7 @@ App::GitDeploy - Command line tool to deploy any application using git
 
 =head1 VERSION
 
-version 1.08
+version 1.09
 
 =head1 DESCRIPTION
 

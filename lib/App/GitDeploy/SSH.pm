@@ -8,6 +8,7 @@ use Net::OpenSSH;
 use Expect;
 use Term::ReadKey;
 use Term::ANSIColor;
+use IO::Prompter;
 
 # use namespace::sweep;
 
@@ -62,45 +63,26 @@ sub run {
                 my $password = get_pw();
                 $exp->send("$password\n");
                 exp_continue;
-              }
+            }
         ],
         [
             qr/@{[ $self->failure_msg ]}/ => sub {
                 my $exp = shift;
                 $failed++;
                 exp_continue;
-              }
+            }
         ],
     );
 
-    warn "Exit status is: " . ($expect->exitstatus // 'undef' ). "\n";
+    warn "Exit status is: " . ( $expect->exitstatus // 'undef' ) . "\n";
 
     return !$failed;
 }
 
 sub get_pw {
-    my $prompt = shift;
-
-    $|++;
-    print $prompt if defined $prompt;
-
-    ReadMode('noecho');
-    ReadMode('raw');
-
-    my $pass = '';
-    while (1) {
-        my $c;
-        1 until defined( $c = ReadKey(-1) );
-        exit if ord($c) == 3;    # ctrl-c
-        last if $c eq "\n";
-        print "*";
-        $pass .= $c;
-    }
-    print "\n";
-
-    END { ReadMode('restore'); }
-
-    return $pass;
+    my $prompt    = shift;
+    my $passwords = {};
+    return $passwords->{$prompt} //= prompt $prompt, -echo => '*';
 }
 
 sub test {
@@ -122,7 +104,7 @@ App::GitDeploy::SSH
 
 =head1 VERSION
 
-version 1.08
+version 1.09
 
 =head1 AUTHOR
 
