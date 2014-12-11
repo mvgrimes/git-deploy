@@ -4,17 +4,15 @@ use 5.012;
 use strict;
 use warnings;
 use Path::Class;
-use IPC::Cmd;
 use Data::Printer;
 use Path::Class qw(dir file);
-use File::chdir;
 use App::GitDeploy::SSH;
 use App::GitDeploy::Config;
 use Term::ANSIColor;
 
 use App::GitDeploy -command;
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 our $config;
 
 sub opt_spec {
@@ -44,7 +42,7 @@ sub validate_args {
 }
 
 sub announce {
-    my ($self, $msg, $color) = @_;
+    my ( $self, $msg, $color ) = @_;
     $color //= 'blue';
     say color($color) . $msg . color('reset');
 }
@@ -57,110 +55,42 @@ sub execute {
     my $prior = ( split /\s+/, `git show-ref refs/remotes/$remote/master` )[0];
     my $current = ( split /\s+/, `git show-ref refs/heads/master` )[0];
 
-
-    $self->announce( 'before-deploy' );
-    run( { cmd => "deploy/$app/$remote/before-deploy", if_exists => 1 } );
-    $self->announce( 'pushing' );
-    run( { cmd => "git push --tags $remote master" } );
-    $self->announce( 'after-deploy' );
-    run( { cmd => "deploy/$app/$remote/after-deploy",  if_exists => 1 } );
+    $self->announce('before-deploy');
+    $self->_run( { cmd => "deploy/$app/$remote/before-deploy", if_exists => 1 } );
+    $self->announce('pushing');
+    $self->_run( { cmd => "git push --tags $remote master" } );
+    $self->announce('after-deploy');
+    $self->_run( { cmd => "deploy/$app/$remote/after-deploy", if_exists => 1 } );
 
     my $post_receive =
       file("deploy/$app/$remote/post-receive")->cleanup->stringify;
 
-    $self->announce( 'post-received' );
-    run( {
-        cmd  => qq{pr=\$( mktemp -t git-deploy.XXXXXXX ) \\
+    $self->announce('post-received');
+    $self->_run( {
+            cmd => qq{pr=\$( mktemp -t git-deploy.XXXXXXX ) \\
                    && git show master:$post_receive > \$pr \\
                    && bash \$pr },
-        host => $config->remote_url,
+            host => $config->remote_url,
     } );
 
-    $self->announce( 'before-restart' );
-    run( {
+    $self->announce('before-restart');
+    $self->_run( {
         cmd       => "deploy/$app/$remote/before-restart $prior $current",
         host      => $config->deploy_url,
         if_exists => 1
     } );
-    $self->announce( 'restart' );
-    run( {
+    $self->announce('restart');
+    $self->_run( {
         cmd       => "deploy/$app/$remote/restart $prior $current",
         host      => $config->deploy_url,
         if_exists => 1
     } );
-    $self->announce( 'after-restart' );
-    run( {
+    $self->announce('after-restart');
+    $self->_run( {
         cmd       => "deploy/$app/$remote/after-restart $prior $current",
         host      => $config->deploy_url,
         if_exists => 1
     } );
-}
-
-sub run {
-    my ($opts) = @_;
-
-    if ( exists $opts->{host} ) {
-        remote_run($opts);
-    } else {
-        local_run($opts);
-    }
-}
-
-sub remote_run {
-    my ($opts) = @_;
-
-    my $cmd = qq{
-        export GIT_DIR="@{[ $config->remote_url->path ]}";
-        export GIT_WORK_TREE="@{[ $config->deploy_dir->path ]}";
-        cd @{[ $opts->{host}->path ]};
-        $opts->{cmd} };
-
-    if ( $opts->{host}->scheme eq 'ssh' ) {
-        my $ssh = App::GitDeploy::SSH->new( uri => $opts->{host} );
-
-        if ( $opts->{if_exists} ) {
-            my $cmd = ( split /\s+/, $opts->{cmd} )[0];
-            my $test_cmd = qq{
-                cd @{[ $opts->{host}->path ]};
-                test -x $cmd };
-            return unless $ssh->test($test_cmd);
-        }
-
-        $ssh->run($cmd)
-          or die color('red')
-          . "Error running '$cmd on remote'\n"
-          . color('reset') . "\n";
-
-    } else {
-        local $CWD = $opts->{host}->path;
-
-        die "Remote path doesn't appear to exist"
-          unless -d $opts->{host}->path;
-
-        local_run( { $opts, cmd => $cmd } );
-    }
-
-}
-
-sub local_run {
-    my ($opts) = @_;
-    my $buffer;
-
-    if ( $opts->{if_exists} ) {
-        my ( $cmd, undef ) = split / /, $opts->{cmd}, 2;
-        return unless IPC::Cmd::can_run($cmd);
-    }
-
-    IPC::Cmd::run(
-        command => $opts->{cmd},
-        verbose => 1,
-        buffer  => \$buffer,
-      )
-      or die color('red')
-      . "Error running '$opts->{cmd}'\n"
-      . color('reset') . "\n";
-
-    return $buffer;
 }
 
 1;
@@ -175,7 +105,7 @@ App::GitDeploy::Command::go
 
 =head1 VERSION
 
-version 1.07
+version 1.08
 
 =head1 AUTHOR
 
