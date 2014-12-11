@@ -12,13 +12,11 @@ use Term::ANSIColor;
 use App::GitDeploy -command;
 with 'App::GitDeploy::Role::Run';
 
-our $VERSION = '1.10';
+our $VERSION = '1.11';
 
 sub opt_spec {
     return (
-        # [ "app|a=s",    "The app to deploy", { default => '.' } ],
-        # [ "remote|r=s", "The remote repos",  { default => 'production' } ],
-    );
+        [ "skip|s", "Redeploy (ie, skip the push, etc)", { default => 0 } ], );
 }
 
 sub validate_args {
@@ -52,17 +50,21 @@ sub execute {
 
     my $prior = ( split /\s+/, `git show-ref refs/remotes/$remote/master` )[0];
     my $current = ( split /\s+/, `git show-ref refs/heads/master` )[0];
-
-    $self->announce('before-deploy');
-    $self->run(
-        { cmd => "deploy/$app/$remote/before-deploy", if_exists => 1 } );
-    $self->announce('pushing');
-    $self->run( { cmd => "git push --tags $remote master" } );
-    $self->announce('after-deploy');
-    $self->run( { cmd => "deploy/$app/$remote/after-deploy", if_exists => 1 } );
-
     my $post_receive =
       file("deploy/$app/$remote/post-receive")->cleanup->stringify;
+
+    if ( not $opt->{skip} ) {
+        $self->announce('before-deploy');
+        $self->run(
+            { cmd => "deploy/$app/$remote/before-deploy", if_exists => 1 } );
+
+        $self->announce('pushing');
+        $self->run( { cmd => "git push --tags $remote master" } );
+
+        $self->announce('after-deploy');
+        $self->run(
+            { cmd => "deploy/$app/$remote/after-deploy", if_exists => 1 } );
+    }
 
     $self->announce('post-received');
     $self->run( {
@@ -104,7 +106,7 @@ App::GitDeploy::Command::go
 
 =head1 VERSION
 
-version 1.10
+version 1.11
 
 =head1 AUTHOR
 

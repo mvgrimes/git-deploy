@@ -11,7 +11,7 @@ use File::Path;
 use App::GitDeploy -command;
 with 'App::GitDeploy::Role::Run';
 
-our $VERSION = '1.10';
+our $VERSION = '1.11';
 
 sub opt_spec {
     return (
@@ -81,7 +81,7 @@ App::GitDeploy::Command::setup
 
 =head1 VERSION
 
-version 1.10
+version 1.11
 
 =head1 AUTHOR
 

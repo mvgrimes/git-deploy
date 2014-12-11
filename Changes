@@ -1,5 +1,8 @@
 App::GitDeploy
 
+1.11 - Thu Dec 11 11:26:59 EST 2014
+    Re-implements "redploy" as a flag (--skip) to go
+
 1.10 - Thu Dec 11 10:51:31 EST 2014
     Fixes bug in new Prompter code
 

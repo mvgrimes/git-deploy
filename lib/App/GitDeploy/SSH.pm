@@ -82,7 +82,8 @@ sub run {
 sub get_pw {
     my $prompt = shift // '';
     state $passwords;
-    return $passwords->{$prompt} //= prompt $prompt, -echo => '*';
+    return $passwords->{$prompt} //=
+      prompt( $prompt, -in => *STDIN, -echo => '*' );
 }
 
 sub test {
@@ -104,7 +105,7 @@ App::GitDeploy::SSH
 
 =head1 VERSION
 
-version 1.10
+version 1.11
 
 =head1 AUTHOR
 
