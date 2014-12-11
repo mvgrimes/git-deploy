@@ -14,7 +14,7 @@ use IPC::System::Simple qw(system systemx capture capturex);
 
 use Role::Tiny;
 
-our $VERSION = '1.09';
+our $VERSION = '1.10';
 our $config;
 
 sub run {

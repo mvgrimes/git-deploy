@@ -1,5 +1,8 @@
 App::GitDeploy
 
+1.10 - Thu Dec 11 10:51:31 EST 2014
+    Fixes bug in new Prompter code
+
 1.09 - Thu Dec 11 10:42:51 EST 2014
     Fixes bug in usage of IPC::System::Simple
     Moves all ->run into a Role

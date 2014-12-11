@@ -80,8 +80,8 @@ sub run {
 }
 
 sub get_pw {
-    my $prompt    = shift;
-    my $passwords = {};
+    my $prompt = shift // '';
+    state $passwords;
     return $passwords->{$prompt} //= prompt $prompt, -echo => '*';
 }
 
@@ -104,7 +104,7 @@ App::GitDeploy::SSH
 
 =head1 VERSION
 
-version 1.09
+version 1.10
 
 =head1 AUTHOR
 

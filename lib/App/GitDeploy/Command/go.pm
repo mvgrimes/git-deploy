@@ -12,7 +12,7 @@ use Term::ANSIColor;
 use App::GitDeploy -command;
 with 'App::GitDeploy::Role::Run';
 
-our $VERSION = '1.09';
+our $VERSION = '1.10';
 
 sub opt_spec {
     return (
@@ -104,7 +104,7 @@ App::GitDeploy::Command::go
 
 =head1 VERSION
 
-version 1.09
+version 1.10
 
 =head1 AUTHOR
 
