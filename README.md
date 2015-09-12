@@ -4,7 +4,7 @@ App::GitDeploy - Command line tool to deploy any application using git
 
 # VERSION
 
-version 1.11
+version 1.12
 
 # DESCRIPTION
 
@@ -76,7 +76,7 @@ Mark Grimes, <mgrimes@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Mark Grimes, <mgrimes@cpan.org>.
+This software is copyright (c) 2015 by Mark Grimes, <mgrimes@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
