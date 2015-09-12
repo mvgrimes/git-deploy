@@ -49,6 +49,8 @@ sub config {
     return $config;
 }
 
+sub default_command { 'go' }
+
 1;
 
 __END__
