@@ -12,7 +12,7 @@ use Term::ANSIColor;
 use App::GitDeploy -command;
 with 'App::GitDeploy::Role::Run';
 
-our $VERSION = '1.12';
+our $VERSION = '1.13';
 
 sub opt_spec {
     return (
@@ -106,7 +106,7 @@ App::GitDeploy::Command::go
 
 =head1 VERSION
 
-version 1.12
+version 1.13
 
 =head1 AUTHOR
 
@@ -114,7 +114,7 @@ Mark Grimes, E<lt>mgrimes@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Mark Grimes, E<lt>mgrimes@cpan.orgE<gt>.
+This software is copyright (c) 2017 by Mark Grimes, E<lt>mgrimes@cpan.orgE<gt>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

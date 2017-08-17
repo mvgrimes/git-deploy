@@ -4,7 +4,7 @@
       "Mark Grimes, E<lt>mgrimes@cpan.orgE<gt>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4208",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
@@ -51,26 +51,26 @@
    "provides" : {
       "App::GitDeploy" : {
          "file" : "lib/App/GitDeploy.pm",
-         "version" : "1.12"
+         "version" : "1.13"
       },
       "App::GitDeploy::Command::go" : {
          "file" : "lib/App/GitDeploy/Command/go.pm",
-         "version" : "1.12"
+         "version" : "1.13"
       },
       "App::GitDeploy::Command::re" : {
          "file" : "lib/App/GitDeploy/Command/re.pm",
-         "version" : "1.12"
+         "version" : "1.13"
       },
       "App::GitDeploy::Command::setup" : {
          "file" : "lib/App/GitDeploy/Command/setup.pm",
-         "version" : "1.12"
+         "version" : "1.13"
       },
       "App::GitDeploy::Config" : {
          "file" : "lib/App/GitDeploy/Config.pm"
       },
       "App::GitDeploy::Role::Run" : {
          "file" : "lib/App/GitDeploy/Role/Run.pm",
-         "version" : "1.12"
+         "version" : "1.13"
       },
       "App::GitDeploy::SSH" : {
          "file" : "lib/App/GitDeploy/SSH.pm"
@@ -88,5 +88,6 @@
          "url" : "http://github.com/mvgrimes/app-gitdeploy"
       }
    },
-   "version" : "1.12"
+   "version" : "1.13",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

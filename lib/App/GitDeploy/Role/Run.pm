@@ -14,7 +14,7 @@ use IPC::System::Simple qw(system systemx capture capturex);
 
 use Role::Tiny;
 
-our $VERSION = '1.12';
+our $VERSION = '1.13';
 our $config;
 
 sub run {
@@ -99,7 +99,7 @@ App::GitDeploy::Role::Run - Role to provide local and remote run commands
 
 =head1 VERSION
 
-version 1.12
+version 1.13
 
 =head1 AUTHOR
 
@@ -107,7 +107,7 @@ Mark Grimes, E<lt>mgrimes@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Mark Grimes, E<lt>mgrimes@cpan.orgE<gt>.
+This software is copyright (c) 2017 by Mark Grimes, E<lt>mgrimes@cpan.orgE<gt>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
