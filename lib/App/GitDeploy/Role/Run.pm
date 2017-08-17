@@ -34,7 +34,7 @@ sub _remote_run {
     my $cmd = qq{
         export GIT_DIR="@{[ $config->remote_url->path ]}";
         export GIT_WORK_TREE="@{[ $config->deploy_dir->path ]}";
-        cd @{[ $opts->{host}->path ]};
+        cd @{[ $config->deploy_dir->path ]};
         $opts->{cmd} };
 
     if ( $opts->{host}->scheme eq 'ssh' ) {
