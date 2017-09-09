@@ -49,3 +49,5 @@ README
 ex/
 t.pl
 App-GitDeploy-*.tar.gz
+.perl-version
+local/

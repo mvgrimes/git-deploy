@@ -1,5 +1,7 @@
 package App::GitDeploy::Command::setup;
 
+# ABSTRACT: Initialize the remote repo and deploy dir
+
 use 5.012;
 use strict;
 use warnings;
@@ -12,6 +14,8 @@ use App::GitDeploy -command;
 with 'App::GitDeploy::Role::Run';
 
 our $VERSION = '1.13';
+
+sub description { 'Initialize the remote repo and deploy dir' };
 
 sub opt_spec {
     return (

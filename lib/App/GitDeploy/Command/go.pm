@@ -1,5 +1,7 @@
 package App::GitDeploy::Command::go;
 
+# ABSTRACT: Execute the deployment
+
 use 5.012;
 use strict;
 use warnings;
@@ -16,7 +18,30 @@ our $VERSION = '1.13';
 
 sub opt_spec {
     return (
-        [ "skip|s", "Redeploy (ie, skip the push, etc)", { default => 0 } ], );
+        ## [ "skip|s", "Redeploy (ie, skip the push, etc)", { default => 0 } ], );
+        [
+            "before-deploy|b!",
+            "Run the before-deploy hook (or no-*)",
+            { default => 1 }
+        ],
+        [ "push!", "Push code to the deploy repo (or no-*)", { default => 1 } ],
+        [
+            "after-deploy!",
+            "Run the after deploy hook (or no-*)",
+            { default => 1 }
+        ],
+        [
+            "before-restart!",
+            "Run the before restart hook (or no-*)",
+            { default => 1 }
+        ],
+        [ "restart!", "Run the restart hook (or no-*)", { default => 1 } ],
+        [
+            "after-restart!",
+            "Run the after-restart hook (or no-*)",
+            { default => 1 }
+        ],
+    );
 }
 
 sub validate_args {
@@ -43,6 +68,12 @@ sub announce {
     say color($color) . $msg . color('reset');
 }
 
+sub announce_and_run {
+    my ( $self, $message, $run_opts ) = @_;
+    $self->announce($message);
+    $self->run($run_opts);
+}
+
 sub execute {
     my ( $self, $opt, $arg ) = @_;
     my $app    = $self->app->global_options->{app};
@@ -53,45 +84,54 @@ sub execute {
     my $post_receive =
       file("deploy/$app/$remote/post-receive")->cleanup->stringify;
 
-    if ( not $opt->{skip} ) {
-        $self->announce('before-deploy');
-        $self->run(
-            { cmd => "deploy/$app/$remote/before-deploy", if_exists => 1 } );
+    $self->announce_and_run(
+        'before-deploy',
+        {
+            cmd       => "deploy/$app/$remote/before-deploy",
+            if_exists => 1
+        } ) if $opt->{'before-deploy'};
 
-        $self->announce('pushing');
-        $self->run( { cmd => "git push --tags $remote master" } );
+    $self->announce_and_run( 'pushing',
+        { cmd => "git push --tags $remote master" } )
+      if $opt->{push};
 
-        $self->announce('after-deploy');
-        $self->run(
-            { cmd => "deploy/$app/$remote/after-deploy", if_exists => 1 } );
-    }
+    $self->announce_and_run(
+        'after-deploy',
+        {
+            cmd       => "deploy/$app/$remote/after-deploy",
+            if_exists => 1
+        } ) if $opt->{'after-deploy'};
 
-    $self->announce('post-received');
-    $self->run( {
+    $self->announce_and_run(
+        'post-received',
+        {
             cmd => qq{pr=\$( mktemp -t git-deploy.XXXXXXX ) \\
                    && git show master:$post_receive > \$pr \\
                    && bash \$pr },
             host => $self->app->config->remote_url,
-    } );
+        } );
 
-    $self->announce('before-restart');
-    $self->run( {
-        cmd       => "deploy/$app/$remote/before-restart $prior $current",
-        host      => $self->app->config->deploy_url,
-        if_exists => 1
-    } );
-    $self->announce('restart');
-    $self->run( {
-        cmd       => "deploy/$app/$remote/restart $prior $current",
-        host      => $self->app->config->deploy_url,
-        if_exists => 1
-    } );
-    $self->announce('after-restart');
-    $self->run( {
-        cmd       => "deploy/$app/$remote/after-restart $prior $current",
-        host      => $self->app->config->deploy_url,
-        if_exists => 1
-    } );
+    $self->announce_and_run(
+        'before-restart',
+        {
+            cmd       => "deploy/$app/$remote/before-restart $prior $current",
+            host      => $self->app->config->deploy_url,
+            if_exists => 1
+        } ) if $opt->{'before-restart'};
+    $self->announce_and_run(
+        'restart',
+        {
+            cmd       => "deploy/$app/$remote/restart $prior $current",
+            host      => $self->app->config->deploy_url,
+            if_exists => 1
+        } ) if $opt->{restart};
+    $self->announce_and_run(
+        'after-restart',
+        {
+            cmd       => "deploy/$app/$remote/after-restart $prior $current",
+            host      => $self->app->config->deploy_url,
+            if_exists => 1
+        } ) if $opt->{'after-restart'};
 }
 
 1;
