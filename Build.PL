@@ -14,7 +14,7 @@ my $build = Module::Build->new(
         'perl'                => '5.012',
         'App::Cmd'            => 0,
         'IPC::System::Simple' => 0,
-        'Path::Class'         => 0,
+        'Path::Tiny'         => 0,
         'Git::Wrapper'        => 0,
         'Data::Printer'       => 0,
         'autodie'             => 0,
@@ -29,6 +29,7 @@ my $build = Module::Build->new(
         'File::ShareDir'      => 0,
         'Term::ReadKey'       => 0,
         'Term::ANSIColor'     => 0,
+        'Perl6::Junction' => 0,
     },
     build_requires =>
       {    # Should be test_requires, but MB still doesn't handle well

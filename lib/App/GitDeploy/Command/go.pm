@@ -5,16 +5,16 @@ package App::GitDeploy::Command::go;
 use 5.012;
 use strict;
 use warnings;
-use Path::Class;
+use Path::Tiny;
 use Data::Printer;
-use Path::Class qw(dir file);
 use Role::Tiny::With;
 use Term::ANSIColor;
+use Perl6::Junction qw(any);
 
 use App::GitDeploy -command;
 with 'App::GitDeploy::Role::Run';
 
-our $VERSION = '1.13';
+our $VERSION = '1.14';
 
 sub opt_spec {
     return (
@@ -47,60 +47,83 @@ sub opt_spec {
 sub validate_args {
     my ( $self, $opt, $args ) = @_;
 
-    my $config       = $self->app->validate_global_opts();
-    my $app          = $self->app->global_options->{app};
-    my $remote       = $self->app->global_options->{remote};
-    my $post_receive = "deploy/$app/$remote/post-receive";
+    my $config  = $self->app->validate_global_opts();
+    my $app     = $self->app->global_options->{app};
+    my $remotes = $self->app->global_options->{remotes};
+    $self->{dry_run} = $self->app->global_options->{dry_run};
 
-    $self->usage_error("A valid app must be specificed")
-      unless -d "deploy/$app/";
-    $self->usage_error("$post_receive must be created")
-      unless -e $post_receive;
-    $self->usage_error("$post_receive must be executable")
-      unless -x $post_receive;
+    for my $remote (@$remotes) {
+        my $post_receive = "deploy/$app/$remote/post-receive";
+
+        $self->usage_error("A valid app must be specificed")
+          unless -d "deploy/$app/";
+        $self->usage_error("$post_receive must be created")
+          unless -e $post_receive;
+        $self->usage_error("$post_receive must be executable")
+          unless -x $post_receive;
+    }
+
+    $self->{before_deploy_run} = [];
 
     return 1;
 }
 
 sub announce {
     my ( $self, $msg, $color ) = @_;
-    $color //= 'blue';
-    say color($color) . $msg . color('reset');
+    say color( $color // 'magenta' ) . $msg . color('reset');
 }
 
 sub announce_and_run {
     my ( $self, $message, $run_opts ) = @_;
     $self->announce($message);
+    $run_opts->{dry_run} = $self->{dry_run};
+    $run_opts->{config}  = $self->app->config->{ $run_opts->{remote} };
     $self->run($run_opts);
 }
 
 sub execute {
     my ( $self, $opt, $arg ) = @_;
-    my $app    = $self->app->global_options->{app};
-    my $remote = $self->app->global_options->{remote};
+    my $app     = $self->app->global_options->{app};
+    my $remotes = $self->app->global_options->{remotes};
+
+    $self->_process_remote( $app, $_, $opt, $arg ) for @$remotes;
+}
+
+sub _process_remote {
+    my ( $self, $app, $remote, $opt, $arg ) = @_;
 
     my $prior = ( split /\s+/, `git show-ref refs/remotes/$remote/master` )[0];
-    my $current = ( split /\s+/, `git show-ref refs/heads/master` )[0];
-    my $post_receive =
-      file("deploy/$app/$remote/post-receive")->cleanup->stringify;
+    my $current       = ( split /\s+/, `git show-ref refs/heads/master` )[0];
+    my $post_receive  = path("deploy/$app/$remote/post-receive");
+    my $before_deploy = path("deploy/$app/$remote/before-deploy");
+    $prior //= '""';
+
+    say color('blue') . "Processing $remote" . color('reset');
+    if ( $opt->{before_deploy} && $self->_havent_run($before_deploy) ) {
+        $self->announce_and_run(
+            'before-deploy',
+            {
+                cmd       => "deploy/$app/$remote/before-deploy",
+                remote    => $remote,
+                if_exists => 1,
+            } );
+        push @{ $self->{before_deploy_run} }, $before_deploy->stat->ino;
+    }
 
     $self->announce_and_run(
-        'before-deploy',
+        'pushing',
         {
-            cmd       => "deploy/$app/$remote/before-deploy",
-            if_exists => 1
-        } ) if $opt->{'before-deploy'};
-
-    $self->announce_and_run( 'pushing',
-        { cmd => "git push --tags $remote master" } )
-      if $opt->{push};
+            cmd    => "git push --tags $remote master",
+            remote => $remote,
+        } ) if $opt->{push};
 
     $self->announce_and_run(
         'after-deploy',
         {
             cmd       => "deploy/$app/$remote/after-deploy",
+            remote    => $remote,
             if_exists => 1
-        } ) if $opt->{'after-deploy'};
+        } ) if $opt->{after_deploy};
 
     $self->announce_and_run(
         'post-received',
@@ -108,30 +131,50 @@ sub execute {
             cmd => qq{pr=\$( mktemp -t git-deploy.XXXXXXX ) \\
                    && git show master:$post_receive > \$pr \\
                    && bash \$pr },
-            host => $self->app->config->remote_url,
+            remote => $remote,
+            host   => $self->app->config->{$remote}->remote_url,
         } );
 
     $self->announce_and_run(
         'before-restart',
         {
             cmd       => "deploy/$app/$remote/before-restart $prior $current",
-            host      => $self->app->config->deploy_url,
-            if_exists => 1
-        } ) if $opt->{'before-restart'};
+            host      => $self->app->config->{$remote}->deploy_url,
+            remote    => $remote,
+            if_exists => 1,
+        } ) if $opt->{before_restart};
     $self->announce_and_run(
         'restart',
         {
             cmd       => "deploy/$app/$remote/restart $prior $current",
-            host      => $self->app->config->deploy_url,
-            if_exists => 1
+            host      => $self->app->config->{$remote}->deploy_url,
+            remote    => $remote,
+            if_exists => 1,
         } ) if $opt->{restart};
     $self->announce_and_run(
         'after-restart',
         {
             cmd       => "deploy/$app/$remote/after-restart $prior $current",
-            host      => $self->app->config->deploy_url,
-            if_exists => 1
-        } ) if $opt->{'after-restart'};
+            host      => $self->app->config->{$remote}->deploy_url,
+            remote    => $remote,
+            if_exists => 1,
+        } ) if $opt->{after_restart};
+}
+
+sub _havent_run {
+    my ( $self, $file ) = @_;
+
+    return unless $file->exists;
+
+    my $inode     = $file->stat->ino;
+    my $files_run = $self->{before_deploy_run};
+
+    my $already_run = $inode == any(@$files_run);
+
+    say color('yellow') . "Skipping $file, already run" . color('reset')
+      if $already_run;
+
+    return !$already_run;
 }
 
 1;
@@ -146,7 +189,7 @@ App::GitDeploy::Command::go
 
 =head1 VERSION
 
-version 1.13
+version 1.14
 
 =head1 AUTHOR
 

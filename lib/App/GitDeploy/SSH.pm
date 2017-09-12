@@ -6,7 +6,6 @@ use warnings;
 use Moo;
 use Net::OpenSSH;
 use Expect;
-use Term::ReadKey;
 use Term::ANSIColor;
 use IO::Prompter;
 
@@ -105,7 +104,7 @@ App::GitDeploy::SSH
 
 =head1 VERSION
 
-version 1.13
+version 1.14
 
 =head1 AUTHOR
 

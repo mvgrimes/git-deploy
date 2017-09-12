@@ -9,30 +9,35 @@ use App::GitDeploy::Config;
 
 use App::Cmd::Setup -app;
 
-our $VERSION = '1.13';
+our $VERSION = '1.14';
 
 sub global_opt_spec {
     return (
-        [ "app|a=s",    "The app to deploy", { default => '.' } ],
-        [ "remote|r=s", "The remote repos",  { default => 'production' } ],
+        [ "app|a=s",      "The app to deploy", { default => '.' } ],
+        [ "remotes|r=s@", "The remote repos",  { default => 'production' } ],
+        [ "dry-run|n!",   "Don't do it",       { default => '0' } ],
     );
 }
 
 sub validate_global_opts {
     my ($self) = @_;
 
-    $self->usage_error("Must be run at the root of your git repo.")
-      unless -e '.git';
+    $self->_chdir_root;
+    $self->usage_error("Not able to chdir to root of repo") unless -e '.git';
 
-    my $remote = $self->global_options->{remote};
+    my $remotes = $self->global_options->{remotes};
+    $remotes = $self->global_options->{remotes} = [$remotes]
+      unless ref $remotes;
 
-    $self->usage_error( qq{Remote $remote must be configured.\n}
-          . qq{Try 'git remote add $remote "ssh://user\@example.com/srv/repos/myapp.git"'}
-    ) unless $self->config->remote_url;
+    for my $remote (@$remotes) {
+        $self->usage_error( qq{Remote $remote must be configured.\n}
+              . qq{Try 'git remote add $remote "ssh://user\@example.com/srv/repos/myapp.git"'}
+        ) unless $self->config->{$remote}->remote_url;
 
-    $self->usage_error( qq{Remote $remote deploy dir must be configured.\n}
-          . qq{Try 'git config --local remote.$remote.deploy "/srv/apps/myapp"'}
-    ) unless $self->config->deploy_url;
+        $self->usage_error( qq{Remote $remote deploy dir must be configured.\n}
+              . qq{Try 'git config --local remote.$remote.deploy "/srv/apps/myapp"'}
+        ) unless $self->config->{$remote}->deploy_url;
+    }
 
     return $self->config;
 }
@@ -41,12 +46,23 @@ sub config {
     my ($self) = @_;
     state $config;
 
-    do {
-        my $remote = $self->global_options->{remote};
-        $config = App::GitDeploy::Config->new( remote => $remote );
-    } unless $config;
+    my $remotes = $self->global_options->{remotes};
+    for my $remote (@$remotes) {
+        $config->{$remote} ||= App::GitDeploy::Config->new( remote => $remote );
+    }
 
     return $config;
+}
+
+sub _chdir_root {
+    my ($self) = @_;
+
+    my $root_dir = `git rev-parse --show-toplevel`;
+    chomp $root_dir;
+
+    $self->usage_error("Are we in a git repo?") unless $root_dir;
+
+    chdir $root_dir;
 }
 
 sub default_command { 'go' }
@@ -63,7 +79,7 @@ App::GitDeploy - Command line tool to deploy any application using git
 
 =head1 VERSION
 
-version 1.13
+version 1.14
 
 =head1 DESCRIPTION
 

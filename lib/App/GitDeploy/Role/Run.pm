@@ -10,28 +10,32 @@ use File::chdir;
 use Term::ANSIColor;
 use App::GitDeploy::SSH;
 use IPC::Cmd ();
+use Data::Printer;
 use IPC::System::Simple qw(system systemx capture capturex);
 
 use Role::Tiny;
 
-our $VERSION = '1.13';
-our $config;
+our $VERSION = '1.14';
 
 sub run {
-    my ($self,$opts) = @_;
+    my ( $self, $opts ) = @_;
 
-    if ( exists $opts->{host} ) {
-        $self->_remote_run($opts);
+    if ( $opts->{'dry_run'} ) {
+        say "   " . $opts->{cmd};
     } else {
-        $self->_local_run($opts);
+        if ( exists $opts->{host} ) {
+            $self->_remote_run($opts);
+        } else {
+            $self->_local_run($opts);
+        }
     }
 }
 
 sub _remote_run {
-    my ($self, $opts) = @_;
+    my ( $self, $opts ) = @_;
 
-    my $config = $self->app->config;
-    my $cmd = qq{
+    my $config = $opts->{config};
+    my $cmd    = qq{
         export GIT_DIR="@{[ $config->remote_url->path ]}";
         export GIT_WORK_TREE="@{[ $config->deploy_dir->path ]}";
         cd @{[ $config->deploy_dir->path ]};
@@ -65,9 +69,9 @@ sub _remote_run {
 }
 
 sub _local_run {
-    my ($self,$opts) = @_;
+    my ( $self, $opts ) = @_;
 
-    my $config = $self->app->config;
+    my $config = $opts->{config};
     my $buffer;
 
     if ( $opts->{if_exists} ) {
@@ -99,7 +103,7 @@ App::GitDeploy::Role::Run - Role to provide local and remote run commands
 
 =head1 VERSION
 
-version 1.13
+version 1.14
 
 =head1 AUTHOR
 
