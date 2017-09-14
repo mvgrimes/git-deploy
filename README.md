@@ -4,7 +4,7 @@ App::GitDeploy - Command line tool to deploy any application using git
 
 # VERSION
 
-version 1.13
+version 1.14
 
 # DESCRIPTION
 
@@ -61,11 +61,6 @@ Which will perform the following:
 [http://www.pythian.com/blog/deploying-stuff-with-git/](http://www.pythian.com/blog/deploying-stuff-with-git/)
 [https://github.com/mislav/git-deploy](https://github.com/mislav/git-deploy)
 
-# BUGS
-
-Please report any bugs or suggestions at 
-[http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-GitDeploy](http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-GitDeploy)
-
 # THANKS
 
 To...
@@ -73,6 +68,18 @@ To...
 # AUTHOR
 
 Mark Grimes, <mgrimes@cpan.org>
+
+# SOURCE
+
+Source repository is at [https://github.com/mvgrimes/git-deploy](https://github.com/mvgrimes/git-deploy).
+
+# BUGS
+
+Please report any bugs or feature requests on the bugtracker website [http://github.com/mvgrimes/git-deploy/issues](http://github.com/mvgrimes/git-deploy/issues)
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 # COPYRIGHT AND LICENSE
 

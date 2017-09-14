@@ -36,7 +36,9 @@ README.md
 TODO
 
 # Local::lib install:
+.perl-version
 ^\.local-v.*
+local/
 
 # O/S specific temp/meta files:
 ^\.DS_Store$
@@ -44,3 +46,5 @@ TODO
 # Repo specific:
 App-GitDeploy*
 ex/
+STEPS
+t.pl

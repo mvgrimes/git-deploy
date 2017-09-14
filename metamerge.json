@@ -1,0 +1,15 @@
+{
+   "name" : "App-GitDeploy",
+   "resources" : {
+      "repository" : {
+         "web" : "http://github.com/mvgrimes/git-deploy",
+         "url" : "http://github.com/mvgrimes/git-deploy.git",
+         "type" : "git"
+      },
+      "bugtracker" : {
+         "web" : "http://github.com/mvgrimes/git-deploy/issues"
+      }
+   },
+   "x_contributors" : [
+   ]
+}

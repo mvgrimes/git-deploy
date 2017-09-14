@@ -185,7 +185,7 @@ __END__
 
 =head1 NAME
 
-App::GitDeploy::Command::go
+App::GitDeploy::Command::go - Execute the deployment
 
 =head1 VERSION
 
@@ -194,6 +194,18 @@ version 1.14
 =head1 AUTHOR
 
 Mark Grimes, E<lt>mgrimes@cpan.orgE<gt>
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/mvgrimes/git-deploy>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<http://github.com/mvgrimes/git-deploy/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =head1 COPYRIGHT AND LICENSE
 

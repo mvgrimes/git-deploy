@@ -51,3 +51,4 @@ t.pl
 App-GitDeploy-*.tar.gz
 .perl-version
 local/
+_build_params

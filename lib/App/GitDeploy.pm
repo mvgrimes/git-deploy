@@ -136,11 +136,6 @@ L<http://krisjordan.com/essays/setting-up-push-to-deploy-with-git>
 L<http://www.pythian.com/blog/deploying-stuff-with-git/>
 L<https://github.com/mislav/git-deploy>
 
-=head1 BUGS
-
-Please report any bugs or suggestions at 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-GitDeploy>
-
 =head1 THANKS
 
 To...
@@ -148,6 +143,18 @@ To...
 =head1 AUTHOR
 
 Mark Grimes, E<lt>mgrimes@cpan.orgE<gt>
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/mvgrimes/git-deploy>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<http://github.com/mvgrimes/git-deploy/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =head1 COPYRIGHT AND LICENSE
 
