@@ -93,7 +93,7 @@ sub _process_remote {
     my ( $self, $app, $remote, $opt, $arg ) = @_;
 
     my $prior = ( split /\s+/, `git show-ref refs/remotes/$remote/master` )[0];
-    my $current       = ( split /\s+/, `git show-ref refs/heads/master` )[0];
+    my $current       = ( split /\s+/, `git rev-parse HEAD` )[0];
     my $post_receive  = path("deploy/$app/$remote/post-receive");
     my $before_deploy = path("deploy/$app/$remote/before-deploy");
     $prior //= '""';
