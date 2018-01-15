@@ -57,22 +57,22 @@
    "provides" : {
       "App::GitDeploy" : {
          "file" : "lib/App/GitDeploy.pm",
-         "version" : "1.14"
+         "version" : "1.15"
       },
       "App::GitDeploy::Command::go" : {
          "file" : "lib/App/GitDeploy/Command/go.pm",
-         "version" : "1.14"
+         "version" : "1.15"
       },
       "App::GitDeploy::Command::setup" : {
          "file" : "lib/App/GitDeploy/Command/setup.pm",
-         "version" : "1.14"
+         "version" : "1.15"
       },
       "App::GitDeploy::Config" : {
          "file" : "lib/App/GitDeploy/Config.pm"
       },
       "App::GitDeploy::Role::Run" : {
          "file" : "lib/App/GitDeploy/Role/Run.pm",
-         "version" : "1.14"
+         "version" : "1.15"
       },
       "App::GitDeploy::SSH" : {
          "file" : "lib/App/GitDeploy/SSH.pm"
@@ -89,7 +89,7 @@
          "web" : "http://github.com/mvgrimes/git-deploy"
       }
    },
-   "version" : "1.14",
+   "version" : "1.15",
    "x_contributors" : [],
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

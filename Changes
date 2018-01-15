@@ -1,5 +1,9 @@
 App::GitDeploy
 
+1.15 - Mon Jan 15 17:38:40 EST 2018
+    Improves 'git show master:post-receive' to handle symlinks
+    Get hash of current head, not master
+
 1.14 - Thu Sep 14 13:40:36 EDT 2017
     Adds support for multiple repos
     Replaces re/--skip with --no-before-deploy, etc.
