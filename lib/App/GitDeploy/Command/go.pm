@@ -129,7 +129,9 @@ sub _process_remote {
         'post-received',
         {
             cmd => qq{pr=\$( mktemp -t git-deploy.XXXXXXX ) \\
-                   && git show master:$post_receive > \$pr \\
+                   && echo "master:$post_receive" | \\
+                      git cat-file --batch --follow-symlinks | \\
+                      tail -n +2 > \$pr \\
                    && bash \$pr },
             remote => $remote,
             host   => $self->app->config->{$remote}->remote_url,
